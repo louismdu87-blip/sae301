@@ -1,0 +1,2 @@
+@layer wordpress, fonts, tokens, reset, base, components, layout, woocommerce;
+@import url("../../../storefront/style.css") layer(wordpress);

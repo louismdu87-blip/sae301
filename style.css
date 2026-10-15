@@ -1,7 +1,881 @@
 /*
 Theme Name: Buissière
-Description: Thème enfant de Storefront pour la Chocolaterie Buissière à Limoges.
+Description: Thème enfant de Storefront — intégration Figma, itération 2.
 Template: storefront
-Version: 1.0.0
+Version: 1.1.0
 Text Domain: buissiere
 */
+
+/* Le parent est isolé dans wordpress ; les variables et composants viennent du design system. */
+@layer wordpress, fonts, tokens, reset, base, components, layout, woocommerce;
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap") layer(fonts);
+
+/* 1. Variables Figma primitives et sémantiques, puis mesures partagées. */
+@layer tokens {
+    :root {
+        --neutral-0: #ffffff;
+        --neutral-100: #f0f0f0;
+        --neutral-400: #9aa0a7;
+        --neutral-500: #6d6d6d;
+        --neutral-700: #43454b;
+        --neutral-800: #2c2d33;
+        --neutral-1000: #000000;
+        --orange-500: #fe5000;
+        --cacao-700: #4e3629;
+        --success-700: #34714a;
+        --success-50: #f1f7f2;
+        --warning-700: #92601c;
+        --danger-700: #b33b32;
+        --danger-50: #fff2f0;
+
+        --background-page: var(--neutral-0);
+        --background-surface: var(--neutral-100);
+        --background-input: var(--neutral-0);
+        --background-footer: var(--neutral-100);
+        --background-accent-subtle: rgb(254 80 0 / 6%);
+        --text-primary: var(--neutral-700);
+        --text-heading: var(--neutral-800);
+        --text-secondary: var(--neutral-500);
+        --text-placeholder: var(--neutral-500);
+        --text-disabled: var(--neutral-400);
+        --text-inverse: var(--neutral-0);
+        --text-strong: var(--neutral-1000);
+        --text-brand: var(--orange-500);
+        --text-link: var(--orange-500);
+        --icon-default: var(--neutral-800);
+        --icon-muted: var(--neutral-500);
+        --icon-inverse: var(--neutral-0);
+        --action-primary-background: var(--orange-500);
+        --action-primary-label: var(--neutral-0);
+        --action-secondary-label: var(--orange-500);
+        --action-disabled-background: var(--neutral-100);
+        --action-disabled-label: var(--neutral-500);
+        --border-default: var(--neutral-400);
+        --border-subtle: var(--neutral-100);
+        --border-interactive: var(--orange-500);
+        --brand-primary: var(--orange-500);
+        --brand-cacao: var(--cacao-700);
+        --feedback-success-text: var(--success-700);
+        --feedback-success-background: var(--success-50);
+        --feedback-success-border: var(--success-700);
+        --feedback-warning-text: var(--warning-700);
+        --feedback-danger-text: var(--danger-700);
+        --feedback-danger-background: var(--danger-50);
+        --feedback-danger-border: var(--danger-700);
+
+        /* Mesures de composants relevées dans l’inspecteur Figma. */
+        --font-family: "Source Sans Pro", Arial, sans-serif;
+        --font-weight-light: 300;
+        --font-weight-regular: 400;
+        --font-size-nav: 0.81rem;
+        --font-size-input: 1rem;
+        --font-size-button: 1.25rem;
+        --font-size-product: 1.25rem;
+        --font-size-heading: 1.7rem;
+        --line-height-input: 1.4;
+        --button-padding-x: 0.63rem;
+        --button-padding-y: 0.31rem;
+        --input-padding: 0.75rem;
+        --input-height: 2.88rem;
+        --control-size: 1.13rem;
+        --radius-control: 0;
+        --border-width: 1px;
+        --product-width: 21.69rem;
+        --product-image-width: 15.56rem;
+        --product-image-height: 14.01rem;
+
+        /* Échelle d’espacement partagée, hors variables Figma. */
+        --space-1: 0.25rem;
+        --space-2: 0.5rem;
+        --space-3: 0.75rem;
+        --space-4: 1rem;
+        --space-5: 1.25rem;
+        --space-6: 1.5rem;
+        --space-8: 2rem;
+        --space-10: 2.5rem;
+        --space-12: 3rem;
+        --space-16: 4rem;
+        --content-width: 70.75rem;
+        --focus-ring: 0 0 0 0.19rem rgb(254 80 0 / 22%);
+    }
+}
+
+/* 2. Normalisation minimale des dimensions. */
+@layer reset {
+    * {
+        box-sizing: border-box;
+    }
+}
+
+/* 3. Styles communs : typographie, éléments HTML et focus clavier. */
+@layer base {
+    body {
+        margin: 0;
+        background: var(--background-page);
+        color: var(--text-primary);
+        font: 400 1rem/1.5 var(--font-family);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+        font: inherit;
+    }
+
+    button,
+    a,
+    input,
+    select,
+    textarea,
+    summary {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    button,
+    a,
+    summary {
+        touch-action: manipulation;
+    }
+
+    button {
+        cursor: pointer;
+    }
+
+    button:disabled {
+        cursor: not-allowed;
+    }
+
+    img,
+    svg {
+        display: block;
+        max-width: 100%;
+    }
+
+    img {
+        height: auto;
+    }
+
+    a {
+        color: inherit;
+    }
+
+    :focus-visible {
+        outline: 0.13rem solid var(--brand-cacao);
+        outline-offset: 0.25rem;
+    }
+}
+
+/* 4. Composants BEM à reprendre dans le thème enfant. */
+@layer components {
+    @layer accessibility {
+        .skip-link {
+            position: fixed;
+            z-index: 10;
+            top: 0.5rem;
+            left: 0.5rem;
+            padding: 0.63rem 1rem;
+            background: var(--brand-cacao);
+            color: var(--text-inverse);
+            transform: translateY(-160%);
+        }
+
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+    }
+
+    @layer actions {
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 2.31rem;
+            max-width: 100%;
+            padding: var(--button-padding-y) var(--button-padding-x);
+            border: var(--border-width) solid var(--border-interactive);
+            border-radius: var(--radius-control);
+            background: transparent;
+            color: var(--action-secondary-label);
+            font: 300 var(--font-size-button)/1.25 var(--font-family);
+            text-align: center;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: background-color .15s, color .15s;
+        }
+
+        .button:hover,
+        .button--filled {
+            background: var(--action-primary-background);
+            color: var(--action-primary-label);
+        }
+
+        .button--filled:hover {
+            background: transparent;
+            color: var(--action-secondary-label);
+        }
+
+        .button:disabled {
+            background: var(--action-disabled-background);
+            border-color: var(--border-subtle);
+            color: var(--action-disabled-label);
+        }
+
+        .button--wide {
+            width: 100%;
+        }
+
+        .text-link {
+            color: var(--text-link);
+            text-decoration: underline;
+            text-underline-offset: 0.25rem;
+        }
+
+        .text-link:hover {
+            color: var(--brand-cacao);
+        }
+
+        .back-link {
+            display: inline-flex;
+            gap: 0.44rem;
+            align-items: center;
+            color: var(--text-link);
+            font-size: 0.88rem;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+            text-underline-offset: 0.25rem;
+        }
+    }
+
+    @layer products {
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: var(--product-width);
+            min-height: 25.94rem;
+            padding: 1.88rem clamp(1.25rem, 4vw, 3.06rem);
+            background: var(--background-surface);
+        }
+
+        .product-card__image {
+            width: var(--product-image-width);
+            height: auto;
+            aspect-ratio: 249 / 224.1;
+            object-fit: contain;
+        }
+
+        .product-card__title {
+            margin: 0;
+            color: var(--text-brand);
+            font-size: var(--font-size-product);
+            font-weight: 400;
+            line-height: 1.25;
+            text-align: center;
+        }
+    }
+
+
+}
+
+/* Mise en page mobile d’abord. Aucun gabarit du parent n’est modifié. */
+@layer layout {
+    .site {
+        overflow-x: clip;
+    }
+
+    .site-header {
+        padding: 0;
+        margin: 0;
+        border: 0;
+        background: var(--background-page);
+    }
+
+    .site-content>.col-full,
+    .site-footer>.col-full {
+        width: auto;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .site-content .content-area {
+        float: none;
+        width: 100%;
+        margin: 0;
+    }
+
+    .site-main {
+        margin: 0;
+    }
+
+    .brand-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        max-width: 63rem;
+        min-height: 4.69rem;
+        margin: auto;
+        padding: 0.63rem 1.25rem;
+    }
+
+    .brand-header__logo {
+        flex: 0 0 6.88rem;
+    }
+
+    .brand-header__logo img {
+        width: 6.88rem;
+        height: auto;
+    }
+
+    .brand-header__navigation {
+        order: 3;
+        width: 100%;
+    }
+
+    .brand-header__links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: .75rem 1.5rem;
+        margin: 0;
+        padding: 0 0 .5rem;
+        list-style: none;
+    }
+
+    .brand-header__links a {
+        color: var(--text-strong);
+        font-size: var(--font-size-nav);
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+
+    .brand-header__links a:hover {
+        color: var(--text-link);
+    }
+
+    .brand-header__actions {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .brand-header__actions a {
+        display: grid;
+        place-items: center;
+        min-width: 2rem;
+        min-height: 2rem;
+        color: var(--icon-default);
+    }
+
+    .brand-header__actions svg {
+        width: 1.5rem;
+        height: 1.5rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.3;
+    }
+
+    .catalogue__hero {
+        position: relative;
+        isolation: isolate;
+        background: var(--brand-cacao);
+    }
+
+    .catalogue__hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background: linear-gradient(transparent 30%, rgb(0 0 0 / 70%));
+    }
+
+    .catalogue__hero img {
+        width: 100%;
+        height: 20rem;
+        object-fit: cover;
+        border-radius: 0;
+    }
+
+    .catalogue__intro {
+        position: absolute;
+        z-index: 1;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        margin: 0;
+        padding: 2rem 1.25rem;
+        color: var(--text-inverse);
+        font-size: 1.13rem;
+        font-weight: 400;
+        line-height: 1.35;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .catalogue__content {
+        max-width: var(--content-width);
+        margin: auto;
+        padding: 3rem 1.25rem 5rem;
+    }
+
+    .catalogue__heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 3rem;
+    }
+
+    .catalogue__title,
+    .catalogue__category-title {
+        color: var(--text-brand);
+        font-weight: var(--font-weight-regular);
+        text-transform: uppercase;
+    }
+
+    .catalogue__title {
+        margin: 0;
+        font-size: var(--font-size-heading);
+        letter-spacing: 0;
+    }
+
+    .catalogue__category {
+        margin-bottom: 4rem;
+    }
+
+    .catalogue__category:last-child {
+        margin-bottom: 0;
+    }
+
+    .catalogue__category-title {
+        margin: 0 0 2rem;
+        font-size: 1.5rem;
+        letter-spacing: 0;
+    }
+
+    .catalogue__category-title a {
+        text-decoration: none;
+    }
+
+    .catalogue__grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .catalogue-filter {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .catalogue-filter summary {
+        cursor: pointer;
+        list-style: none;
+    }
+
+    .catalogue-filter summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .catalogue-filter__list {
+        position: absolute;
+        z-index: 3;
+        top: 100%;
+        right: 0;
+        min-width: 12rem;
+        margin: .5rem 0 0;
+        padding: 1rem;
+        border: 1px solid var(--border-subtle);
+        background: var(--background-page);
+        list-style: none;
+        box-shadow: 0 .25rem 1rem rgb(0 0 0 / 8%);
+    }
+
+    .catalogue-filter__list a {
+        display: block;
+        padding: .5rem;
+        color: var(--text-link);
+    }
+
+    .catalogue__grid .product-card,
+    ul.products li.product-card {
+        float: none;
+        display: flex;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        text-align: center;
+    }
+
+    .product-card__visual {
+        display: grid;
+        place-items: center;
+        width: 100%;
+    }
+
+    .product-card__title a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .product-card__button {
+        margin-top: auto;
+    }
+
+    .site-footer {
+        padding: 2.5rem 1.25rem;
+        background: var(--background-footer);
+        color: var(--text-primary);
+    }
+
+    .brand-footer {
+        max-width: var(--content-width);
+        margin: auto;
+        text-align: center;
+        font-size: 0.88rem;
+    }
+
+    .brand-footer p {
+        margin: .75rem 0 0;
+    }
+
+    .brand-footer__links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: .5rem 2rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .brand-footer__links:empty {
+        display: none;
+    }
+
+    .site-footer a {
+        color: inherit;
+    }
+
+    @media (min-width: 40rem) {
+        .brand-header {
+            flex-wrap: nowrap;
+        }
+
+        .brand-header__navigation {
+            order: initial;
+            width: auto;
+        }
+
+        .brand-header__links {
+            padding: 0;
+        }
+
+        .catalogue__grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .catalogue__hero img {
+            height: clamp(20rem, 34.86vw, 31.38rem);
+        }
+
+        .catalogue__intro {
+            padding-bottom: 3.5rem;
+            font-size: 1.7rem;
+        }
+
+        .catalogue__content {
+            padding-top: 5rem;
+            padding-bottom: 7rem;
+        }
+    }
+
+    @media (min-width: 64rem) {
+        .catalogue__content {
+            padding: 6.25rem 0 8rem;
+            width: calc(100% - 5rem);
+        }
+
+        .catalogue__grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 2.75rem;
+        }
+
+        .catalogue__category {
+            margin-bottom: 6.25rem;
+        }
+    }
+}
+
+/* Adaptateurs WooCommerce : comportement natif, présentation du design system. */
+@layer woocommerce {
+    .storefront-breadcrumb {
+        margin: 0;
+        padding: 0;
+    }
+
+    .storefront-breadcrumb>.col-full {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .woocommerce-breadcrumb {
+        max-width: var(--content-width);
+        margin: 0 auto;
+        padding: 1.5rem 1.25rem;
+        color: var(--text-secondary);
+        font-size: 0.81rem;
+    }
+
+    .woocommerce-breadcrumb a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .woocommerce-breadcrumb .breadcrumb-separator::after {
+        display: none;
+    }
+
+    .woocommerce-breadcrumb a:first-of-type::before {
+        display: none;
+    }
+
+    .single-product .site-main,
+    .tax-product_cat .site-main,
+    .tax-product_tag .site-main,
+    .woocommerce-cart .site-main,
+    .woocommerce-checkout .site-main,
+    .woocommerce-account .site-main {
+        width: calc(100% - 2.5rem);
+        max-width: var(--content-width);
+        margin: 0 auto;
+        padding: 1.5rem 0 5rem;
+    }
+
+    .single-product div.product {
+        display: flow-root;
+    }
+
+    .single-product div.product .woocommerce-product-gallery,
+    .single-product div.product .summary {
+        float: none;
+        width: 100%;
+        margin: 0 0 2rem;
+    }
+
+    .single-product div.product .woocommerce-product-gallery {
+        padding: 1rem;
+        background: var(--background-surface);
+    }
+
+    .single-product .woocommerce-product-gallery img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: contain;
+        border-radius: 0;
+    }
+
+    .single-product div.product .product_title {
+        margin: 0 0 1.5rem;
+        color: var(--text-brand);
+        font-size: 2rem;
+        font-weight: 400;
+        line-height: 1.2;
+        text-transform: uppercase;
+        letter-spacing: 0;
+    }
+
+    .product-view__category {
+        margin: 0 0 .75rem;
+        color: var(--text-brand);
+        font-size: 0.88rem;
+        text-transform: uppercase;
+    }
+
+    .product-view__category a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .woocommerce-product-details__short-description {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .single-product div.product p.price {
+        margin: 2rem 0 1.5rem;
+        color: var(--text-brand);
+        font-size: 2.25rem;
+        font-weight: 400;
+    }
+
+    .single-product div.product form.cart {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem;
+        margin: 0;
+        padding: 0;
+    }
+
+    .single-product div.product form.cart .quantity {
+        float: none;
+        margin: 0;
+    }
+
+    .quantity .qty,
+    input.input-text,
+    select,
+    textarea {
+        min-height: var(--input-height);
+        padding: var(--input-padding);
+        border: 1px solid var(--border-default);
+        border-radius: 0;
+        background: var(--background-input);
+        color: var(--text-primary);
+        box-shadow: none;
+    }
+
+    .quantity .qty {
+        width: 5rem;
+        text-align: center;
+    }
+
+    .single-product div.product form.cart .button,
+    .woocommerce .button,
+    .woocommerce button.button {
+        min-height: 2.88rem;
+        padding: var(--button-padding-y) var(--button-padding-x);
+        border: 1px solid var(--border-interactive);
+        border-radius: 0;
+        background: transparent;
+        color: var(--action-secondary-label);
+        font: 300 var(--font-size-button)/1.25 var(--font-family);
+        text-transform: uppercase;
+    }
+
+    .single-product div.product form.cart .button:hover,
+    .woocommerce .button:hover {
+        background: var(--action-primary-background);
+        color: var(--action-primary-label);
+    }
+
+    .woocommerce .button:disabled {
+        background: var(--action-disabled-background);
+        color: var(--action-disabled-label);
+        cursor: not-allowed;
+    }
+
+    .woocommerce-tabs {
+        clear: both;
+    }
+
+    .woocommerce-tabs .panel h2 {
+        color: var(--text-brand);
+        font-weight: 400;
+    }
+
+    ul.products {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2rem;
+        margin: 0;
+    }
+
+    ul.products::before,
+    ul.products::after {
+        display: none;
+    }
+
+    ul.products li.product-card img {
+        width: var(--product-image-width);
+        margin: 0;
+    }
+
+    ul.products li.product-card .product-card__title {
+        margin: 0;
+        color: var(--text-brand);
+        font-size: var(--font-size-product);
+        font-weight: 400;
+    }
+
+    .woocommerce-products-header__title {
+        color: var(--text-brand);
+        font-size: var(--font-size-heading);
+        font-weight: 400;
+        text-transform: uppercase;
+    }
+
+    .woocommerce-message {
+        border-color: var(--feedback-success-border);
+        background: var(--feedback-success-background);
+        color: var(--feedback-success-text);
+    }
+
+    .woocommerce-error {
+        border-color: var(--feedback-danger-border);
+        background: var(--feedback-danger-background);
+        color: var(--feedback-danger-text);
+    }
+
+    .woocommerce-info {
+        border-color: var(--border-interactive);
+        background: var(--background-accent-subtle);
+        color: var(--text-primary);
+    }
+
+    .woocommerce-message a,
+    .woocommerce-info a,
+    .woocommerce-error a {
+        color: inherit;
+    }
+
+    @media (min-width: 40rem) {
+        ul.products {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (min-width: 64rem) {
+        .single-product div.product .woocommerce-product-gallery {
+            float: left;
+            width: 44%;
+            margin-right: 4%;
+        }
+
+        .single-product div.product .summary {
+            float: right;
+            width: 52%;
+        }
+
+        .single-product .site-main {
+            padding-bottom: 7rem;
+        }
+
+        ul.products {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 2.75rem;
+        }
+
+        .woocommerce-breadcrumb {
+            padding-left: 0;
+            padding-right: 0;
+            width: calc(100% - 2.5rem);
+        }
+    }
+}
