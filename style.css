@@ -293,10 +293,26 @@ Text Domain: buissiere
     }
 
     .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
         padding: 0;
         margin: 0;
         border: 0;
         background: var(--background-page);
+    }
+
+    /* Garde les cibles des liens visibles sous l’en-tête. */
+    #nos-produits,
+    #main {
+        scroll-margin-top: 9rem;
+    }
+
+    /* La barre WordPress est fixe à partir de cette largeur. */
+    @media (min-width: 37.56rem) {
+        .admin-bar .site-header {
+            top: var(--wp-admin--admin-bar--height, 2rem);
+        }
     }
 
     .site-content>.col-full,
@@ -572,6 +588,11 @@ Text Domain: buissiere
     }
 
     @media (min-width: 40rem) {
+        #nos-produits,
+        #main {
+            scroll-margin-top: 6rem;
+        }
+
         .brand-header {
             flex-wrap: nowrap;
         }
