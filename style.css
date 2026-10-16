@@ -642,6 +642,40 @@ Text Domain: buissiere
     }
 }
 
+/* Itération 4 : informations produit réutilisables, mobile first. */
+@layer components {
+    .product-information {
+        display: grid;
+        gap: var(--space-4);
+        margin: var(--space-6) 0;
+        padding: var(--space-5) 0;
+        border-top: var(--border-width) solid var(--border-subtle);
+        border-bottom: var(--border-width) solid var(--border-subtle);
+        list-style: none;
+    }
+
+    .product-information__item {
+        min-width: 0;
+        margin: 0;
+    }
+
+    .product-information__title {
+        margin: 0 0 var(--space-1);
+        color: var(--text-heading);
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .product-information__text {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.88rem;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+}
+
 /* Adaptateurs WooCommerce : comportement natif, présentation du design system. */
 @layer woocommerce {
     /* Itération 3 : formats sous l’image et quantité selon la maquette Figma. */

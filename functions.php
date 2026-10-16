@@ -56,6 +56,8 @@ function buissiere_setup_layout() {
     remove_action( 'woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 10 );
     remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
     remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_price', 10 );
+    // Itération 4 : informations SCF après la description et avant le prix.
+    add_action( 'woocommerce_single_product_summary', 'buissiere_product_information', 22 );
     add_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_price', 25 );
     add_action( 'woocommerce_single_product_summary', 'buissiere_product_category', 4 );
     remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40 );
@@ -75,6 +77,39 @@ function buissiere_product_category() {
     global $product;
     echo '<p class="product-view__category">' . wp_kses_post( wc_get_product_category_list( $product->get_id(), ', ' ) ) . '</p>';
 }
+/** Informations administrées dans SCF ; seuls les champs renseignés sont affichés. */
+function buissiere_product_information() {
+    global $product;
+    if ( ! $product || ! function_exists( 'get_field' ) ) {
+        return;
+    }
+    $fields = array(
+        'compositions'            => 'Composition',
+        'allergenes'              => 'Allergènes',
+        'valeurs_nutritionnelles' => 'Valeurs nutritionnelles moyennes pour 100 g',
+    );
+    $items = array();
+    foreach ( $fields as $name => $label ) {
+        $value = get_field( $name, $product->get_id() );
+        if ( is_string( $value ) && '' !== trim( $value ) ) {
+            $items[] = array( 'label' => $label, 'value' => $value );
+        }
+    }
+    if ( ! $items ) {
+        return;
+    }
+    ?>
+    <ul class="product-information" aria-label="Informations du produit">
+        <?php foreach ( $items as $item ) : ?>
+            <li class="product-information__item">
+                <h2 class="product-information__title"><?php echo esc_html( $item['label'] ); ?></h2>
+                <p class="product-information__text"><?php echo nl2br( esc_html( $item['value'] ) ); ?></p>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+    <?php
+}
+
 add_filter( 'woocommerce_product_tabs', function ( $tabs ) {
     global $product;
     unset( $tabs['reviews'] );
