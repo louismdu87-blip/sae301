@@ -1,5 +1,5 @@
 <?php
-/** Intégration Figma — itération 2 : catalogue et produits simples. */
+/** Intégration Figma — catalogue et test des produits variables. */
 defined( 'ABSPATH' ) || exit;
 
 /** Le parent reste disponible, dans une couche inférieure au design system. */
@@ -13,6 +13,19 @@ function buissiere_enqueue_styles() {
             if ( $inline ) {
                 $styles->add_data( $handle, 'after', array_map( function ( $css ) { return '@layer wordpress {' . $css . '}'; }, $inline ) );
             }
+        }
+    }
+    if ( function_exists( 'is_product' ) && is_product() ) {
+        $product = wc_get_product( get_queried_object_id() );
+        if ( $product && $product->is_type( 'variable' ) ) {
+            wp_enqueue_script( 'buissiere-product-options', get_stylesheet_directory_uri() . '/assets/js/product-options.js', array( 'jquery', 'wc-add-to-cart-variation' ), filemtime( get_stylesheet_directory() . '/assets/js/product-options.js' ), true );
+            wp_localize_script( 'buissiere-product-options', 'buissierePriceSettings', array(
+                'decimals'          => wc_get_price_decimals(),
+                'decimalSeparator'  => wc_get_price_decimal_separator(),
+                'thousandSeparator' => wc_get_price_thousand_separator(),
+                'currencySymbol'    => html_entity_decode( get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8' ),
+                'priceFormat'       => html_entity_decode( get_woocommerce_price_format(), ENT_QUOTES, 'UTF-8' ),
+            ) );
         }
     }
     wp_dequeue_style( 'storefront-fonts' );
@@ -34,6 +47,11 @@ function buissiere_setup_layout() {
     remove_action( 'storefront_after_footer', 'storefront_sticky_single_add_to_cart', 999 );
     // Itération 2 : consultation du catalogue et des fiches uniquement.
     remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+    // Itération 3 : sélecteur natif et prix des variations, sans achat.
+    add_action( 'woocommerce_single_product_summary', 'buissiere_variable_product_options', 30 );
+    add_action( 'woocommerce_before_single_product_summary', 'buissiere_variable_product_formats', 21 );
+    remove_action( 'woocommerce_single_variation', 'woocommerce_single_variation_add_to_cart_button', 20 );
+    add_action( 'woocommerce_single_variation', 'buissiere_variable_product_quantity', 20 );
     remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 10 );
     remove_action( 'woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 10 );
     remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
@@ -58,7 +76,11 @@ function buissiere_product_category() {
     echo '<p class="product-view__category">' . wp_kses_post( wc_get_product_category_list( $product->get_id(), ', ' ) ) . '</p>';
 }
 add_filter( 'woocommerce_product_tabs', function ( $tabs ) {
+    global $product;
     unset( $tabs['reviews'] );
+    if ( $product && $product->is_type( 'variable' ) ) {
+        unset( $tabs['additional_information'] );
+    }
     return $tabs;
 } );
 /** L’accueil est l’unique entrée du catalogue. */
@@ -91,13 +113,15 @@ function buissiere_setup_product_cards() {
 add_action( 'after_setup_theme', 'buissiere_setup_product_cards', 110 );
 
 /** Ajoute la classe BEM aux cartes sans modifier celle de la fiche produit. */
-function buissiere_product_card_classes( $classes ) {
+function buissiere_product_card_classes( $classes, $product ) {
     if ( ! is_product() ) {
         $classes[] = 'product-card';
+    } elseif ( $product->is_type( 'variable' ) ) {
+        $classes[] = 'product-view--variable';
     }
     return $classes;
 }
-add_filter( 'woocommerce_post_class', 'buissiere_product_card_classes' );
+add_filter( 'woocommerce_post_class', 'buissiere_product_card_classes', 10, 2 );
 
 function buissiere_product_card_image() {
     global $product;
@@ -122,3 +146,95 @@ function buissiere_product_card_button() {
     <a class="button product-card__button" href="<?php echo esc_url( $product->get_permalink() ); ?>" aria-label="<?php echo esc_attr( 'Découvrir : ' . $product->get_name() ); ?>">Découvrir</a>
     <?php
 }
+
+/** Affiche le formulaire natif uniquement pour les produits variables. */
+function buissiere_variable_product_options() {
+    global $product;
+    if ( $product && $product->is_type( 'variable' ) ) {
+        woocommerce_variable_add_to_cart();
+    }
+}
+
+/** Quantité native WooCommerce, séparée du bouton d’achat des étapes suivantes. */
+function buissiere_variable_product_quantity() {
+    global $product;
+    if ( ! $product || ! $product->is_type( 'variable' ) ) {
+        return;
+    }
+    $input_id = 'product-quantity-' . $product->get_id();
+    ?>
+    <div class="product-options__quantity">
+        <label class="product-options__quantity-label" for="<?php echo esc_attr( $input_id ); ?>">Quantité</label>
+        <div class="product-options__stepper">
+            <button class="product-options__quantity-button" type="button" data-quantity-step="-1" aria-label="Diminuer la quantité" disabled>−</button>
+        <?php
+        woocommerce_quantity_input( array(
+            'input_id'    => $input_id,
+            'input_value' => $product->get_min_purchase_quantity(),
+            'min_value'   => $product->get_min_purchase_quantity(),
+            'max_value'   => $product->get_max_purchase_quantity(),
+        ), $product );
+        ?>
+            <button class="product-options__quantity-button" type="button" data-quantity-step="1" aria-label="Augmenter la quantité">+</button>
+        </div>
+    </div>
+    <?php
+}
+
+/** Formats sous l’image ; les valeurs restent celles administrées dans WooCommerce. */
+function buissiere_variable_product_formats() {
+    global $product;
+    if ( ! $product || ! $product->is_type( 'variable' ) ) {
+        return;
+    }
+    echo '<div class="product-options">';
+    foreach ( $product->get_variation_attributes() as $attribute => $options ) {
+        $key = sanitize_title( $attribute );
+        $label_id = 'product-options-' . $product->get_id() . '-' . $key;
+        $label = 'format' === $key ? 'Taille' : wc_attribute_label( $attribute, $product );
+        ?>
+        <div class="product-options__formats" data-attribute="<?php echo esc_attr( wc_variation_attribute_name( $attribute ) ); ?>" hidden>
+            <p class="product-options__label" id="<?php echo esc_attr( $label_id ); ?>"><?php echo esc_html( $label ); ?></p>
+            <ul class="product-options__choices" role="radiogroup" aria-labelledby="<?php echo esc_attr( $label_id ); ?>">
+                <?php foreach ( $options as $option ) :
+                    $option_label = $option;
+                    if ( taxonomy_exists( $attribute ) ) {
+                        $term = get_term_by( 'slug', $option, $attribute );
+                        if ( $term ) { $option_label = $term->name; }
+                    }
+                    ?>
+                    <li class="product-options__item">
+                        <label class="product-options__option">
+                            <input class="product-options__radio" type="radio" name="buissiere-<?php echo esc_attr( $product->get_id() . '-' . $key ); ?>" value="<?php echo esc_attr( $option ); ?>">
+                            <span class="product-options__choice"><?php echo esc_html( $option_label ); ?></span>
+                        </label>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <?php
+    }
+    echo '</div>';
+}
+
+/** Prix et disponibilité réels de la variation, présentés comme sur la maquette. */
+add_filter( 'woocommerce_available_variation', function ( $data, $product, $variation ) {
+    $format = $variation->get_attribute( 'format' );
+    $data['price_html'] = $variation->get_price_html();
+    if ( $format ) {
+        $data['price_html'] .= '<span class="product-options__price-meta">TTC · ' . esc_html( $format ) . '</span>';
+    }
+    $quantity = $variation->get_stock_quantity();
+    if ( ! $variation->is_in_stock() ) {
+        $state = 'out';
+        $message = 'Épuisé';
+    } elseif ( $variation->managing_stock() && null !== $quantity && $quantity <= wc_get_low_stock_amount( $variation ) ) {
+        $state = 'low';
+        $message = sprintf( 'Stock faible · %s restant(s)', wc_format_stock_quantity_for_display( $quantity, $variation ) );
+    } else {
+        $state = 'available';
+        $message = 'Disponible';
+    }
+    $data['availability_html'] = '<p class="product-options__availability product-options__availability--' . esc_attr( $state ) . '">' . esc_html( $message ) . '</p>';
+    return $data;
+}, 10, 3 );
