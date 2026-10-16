@@ -22,4 +22,14 @@
             <li><a href="<?php echo esc_url( home_url( '/#nos-produits' ) ); ?>">Nos produits</a></li>
         </ul>
     </nav>
+    <?php if ( function_exists( 'wc_get_cart_url' ) ) : ?>
+        <div class="brand-header__actions">
+            <a class="brand-header__cart" href="<?php echo esc_url( wc_get_cart_url() ); ?>" aria-label="Voir le panier"<?php if ( is_cart() ) { echo ' aria-current="page"'; } ?>>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M5 8h14l1 13H4L5 8Z" stroke-linejoin="round" />
+                    <path d="M8 9V6a4 4 0 0 1 8 0v3" stroke-linecap="round" />
+                </svg>
+            </a>
+        </div>
+    <?php endif; ?>
 </div>

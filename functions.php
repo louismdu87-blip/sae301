@@ -28,6 +28,9 @@ function buissiere_enqueue_styles() {
             ) );
         }
     }
+    if ( function_exists( 'is_cart' ) && is_cart() ) {
+        wp_enqueue_script( 'buissiere-cart', get_stylesheet_directory_uri() . '/assets/js/cart.js', array( 'jquery', 'wc-cart' ), filemtime( get_stylesheet_directory() . '/assets/js/cart.js' ), true );
+    }
     wp_dequeue_style( 'storefront-fonts' );
     wp_dequeue_style( 'source-sans-pro' );
     wp_enqueue_style( 'storefront-child-style', get_stylesheet_uri(), array( 'storefront-style' ), filemtime( get_stylesheet_directory() . '/style.css' ) );
@@ -45,13 +48,10 @@ function buissiere_setup_layout() {
     }, 10 );
     remove_action( 'storefront_sidebar', 'storefront_get_sidebar', 10 );
     remove_action( 'storefront_after_footer', 'storefront_sticky_single_add_to_cart', 999 );
-    // Itération 2 : consultation du catalogue et des fiches uniquement.
-    remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
-    // Itération 3 : sélecteur natif et prix des variations, sans achat.
-    add_action( 'woocommerce_single_product_summary', 'buissiere_variable_product_options', 30 );
+    // Itération 5 : formulaire et bouton d’achat natifs, avec les contrôles de quantité BEM.
     add_action( 'woocommerce_before_single_product_summary', 'buissiere_variable_product_formats', 21 );
-    remove_action( 'woocommerce_single_variation', 'woocommerce_single_variation_add_to_cart_button', 20 );
-    add_action( 'woocommerce_single_variation', 'buissiere_variable_product_quantity', 20 );
+    add_action( 'woocommerce_before_add_to_cart_quantity', 'buissiere_variable_quantity_open' );
+    add_action( 'woocommerce_after_add_to_cart_quantity', 'buissiere_variable_quantity_close' );
     remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 10 );
     remove_action( 'woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 10 );
     remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
@@ -182,34 +182,25 @@ function buissiere_product_card_button() {
     <?php
 }
 
-/** Affiche le formulaire natif uniquement pour les produits variables. */
-function buissiere_variable_product_options() {
-    global $product;
-    if ( $product && $product->is_type( 'variable' ) ) {
-        woocommerce_variable_add_to_cart();
-    }
-}
-
-/** Quantité native WooCommerce, séparée du bouton d’achat des étapes suivantes. */
-function buissiere_variable_product_quantity() {
+/** Encadre la quantité native sans surcharger le modèle WooCommerce. */
+function buissiere_variable_quantity_open() {
     global $product;
     if ( ! $product || ! $product->is_type( 'variable' ) ) {
         return;
     }
-    $input_id = 'product-quantity-' . $product->get_id();
     ?>
     <div class="product-options__quantity">
-        <label class="product-options__quantity-label" for="<?php echo esc_attr( $input_id ); ?>">Quantité</label>
         <div class="product-options__stepper">
             <button class="product-options__quantity-button" type="button" data-quantity-step="-1" aria-label="Diminuer la quantité" disabled>−</button>
-        <?php
-        woocommerce_quantity_input( array(
-            'input_id'    => $input_id,
-            'input_value' => $product->get_min_purchase_quantity(),
-            'min_value'   => $product->get_min_purchase_quantity(),
-            'max_value'   => $product->get_max_purchase_quantity(),
-        ), $product );
-        ?>
+    <?php
+}
+
+function buissiere_variable_quantity_close() {
+    global $product;
+    if ( ! $product || ! $product->is_type( 'variable' ) ) {
+        return;
+    }
+    ?>
             <button class="product-options__quantity-button" type="button" data-quantity-step="1" aria-label="Augmenter la quantité">+</button>
         </div>
     </div>
@@ -273,3 +264,104 @@ add_filter( 'woocommerce_available_variation', function ( $data, $product, $vari
     $data['availability_html'] = '<p class="product-options__availability product-options__availability--' . esc_attr( $state ) . '">' . esc_html( $message ) . '</p>';
     return $data;
 }, 10, 3 );
+
+/** Itération 5 : panier natif WooCommerce, présenté selon les maquettes Figma. */
+function buissiere_cart_title( $title, $post_id ) {
+    if ( function_exists( 'is_cart' ) && is_cart() && in_the_loop() && is_main_query() && wc_get_page_id( 'cart' ) === (int) $post_id ) {
+        return 'Votre panier';
+    }
+    return $title;
+}
+add_filter( 'the_title', 'buissiere_cart_title', 10, 2 );
+
+function buissiere_cart_progress() {
+    ?>
+    <ol class="cart-page__steps" aria-label="Étapes de la commande">
+        <li class="cart-page__step cart-page__step--current" aria-current="step"><span class="cart-page__step-number">1</span>Panier</li>
+        <li class="cart-page__step"><span class="cart-page__step-number">2</span>Commander</li>
+        <li class="cart-page__step"><span class="cart-page__step-number">3</span>Confirmation</li>
+    </ol>
+    <?php
+}
+add_action( 'woocommerce_cart_is_empty', 'buissiere_cart_progress', 1 );
+
+function buissiere_cart_open() {
+    buissiere_cart_progress();
+    echo '<div class="cart-page__layout">';
+}
+add_action( 'woocommerce_before_cart', 'buissiere_cart_open' );
+
+function buissiere_cart_close() {
+    ?>
+    </div>
+    <p class="cart-page__support">Une question sur votre commande ? <a href="tel:+33555341044">05 55 34 10 44</a></p>
+    <?php
+}
+add_action( 'woocommerce_after_cart', 'buissiere_cart_close' );
+
+function buissiere_cart_return() {
+    ?>
+    <a class="cart-page__return" href="<?php echo esc_url( home_url( '/#nos-produits' ) ); ?>">← Retour aux produits : Accueil · Nos produits</a>
+    <?php
+}
+add_action( 'woocommerce_after_cart_table', 'buissiere_cart_return' );
+add_action( 'woocommerce_after_cart_totals', function () {
+    if ( 'yes' === get_option( 'woocommerce_enable_guest_checkout' ) ) {
+        echo '<p class="cart-page__guest">Commande possible sans créer de compte.</p>';
+    }
+} );
+add_action( 'woocommerce_proceed_to_checkout', function () {
+    echo '<p class="cart-page__delivery">Retrait gratuit en chocolaterie ou livraison à domicile.<br>L’adresse et le mode de réception sont à choisir à l’étape suivante.</p>';
+}, 5 );
+add_action( 'wp', function () {
+    if ( is_cart() ) {
+        remove_action( 'woocommerce_cart_collaterals', 'woocommerce_cross_sell_display' );
+    }
+} );
+
+/** Réutilise l’input natif : nom, quantité et limites de stock restent gérés par WooCommerce. */
+add_filter( 'woocommerce_cart_item_quantity', function ( $html, $key, $item ) {
+    if ( ! is_cart() || $item['data']->is_sold_individually() ) {
+        return $html;
+    }
+    $name = $item['data']->get_name();
+    return '<div class="cart-quantity">'
+        . '<button class="cart-quantity__button" type="button" data-cart-step="-1" aria-label="' . esc_attr( 'Diminuer la quantité de ' . $name ) . '">−</button>'
+        . $html
+        . '<button class="cart-quantity__button" type="button" data-cart-step="1" aria-label="' . esc_attr( 'Augmenter la quantité de ' . $name ) . '">+</button>'
+        . '</div>';
+}, 10, 3 );
+add_filter( 'woocommerce_cart_item_remove_link', function ( $html, $key ) {
+    if ( ! is_cart() ) {
+        return $html;
+    }
+    $item = WC()->cart->get_cart_item( $key );
+    return '<a class="remove cart-page__remove" role="button" href="' . esc_url( wc_get_cart_remove_url( $key ) ) . '" aria-label="' . esc_attr( 'Supprimer ' . $item['data']->get_name() . ' du panier' ) . '">× Supprimer</a>';
+}, 10, 2 );
+
+add_action( 'woocommerce_cart_coupon', function () {
+    echo '<span class="cart-page__coupon-label" aria-hidden="true">Code promo</span>';
+} );
+function buissiere_cart_checkout_button() {
+    echo '<a href="' . esc_url( wc_get_checkout_url() ) . '" class="checkout-button button alt wc-forward">Passer commande</a>';
+}
+add_action( 'after_setup_theme', function () {
+    remove_action( 'woocommerce_proceed_to_checkout', 'woocommerce_button_proceed_to_checkout', 20 );
+    add_action( 'woocommerce_proceed_to_checkout', 'buissiere_cart_checkout_button', 20 );
+}, 100 );
+
+add_filter( 'woocommerce_cart_item_name', function ( $name, $item ) {
+    if ( ! is_cart() || ! $item['data']->is_type( 'variation' ) ) {
+        return $name;
+    }
+    $product = wc_get_product( $item['product_id'] );
+    $format = $item['data']->get_attribute( 'format' );
+    if ( false === strpos( $name, '<a ' ) ) {
+        return esc_html( $product->get_name() );
+    }
+    $html = '<a href="' . esc_url( $item['data']->get_permalink() ) . '">' . esc_html( $product->get_name() ) . '</a>';
+    if ( $format ) {
+        $html .= '<ul class="cart-page__options"><li>Format : ' . esc_html( $format ) . '</li></ul>';
+    }
+    return $html;
+}, 10, 2 );
