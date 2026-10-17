@@ -1662,3 +1662,26 @@ Text Domain: buissiere
     .cart-page__options { margin: var(--space-1) 0 0; padding: 0; list-style: none; color: var(--text-secondary); font-size: 0.81rem; }
     .cart-page__options li { margin: 0; }
 }
+
+/* Itération 6 : informations de retrait dans le formulaire de commande natif. */
+@layer components {
+    .pickup-instructions {
+        margin: var(--space-4) 0;
+        padding: var(--space-5);
+        background: var(--background-surface);
+        color: var(--text-primary);
+    }
+
+    .pickup-instructions__title {
+        margin: 0 0 var(--space-2);
+        color: var(--text-brand);
+        font: 400 1.13rem/1.4 var(--font-family);
+    }
+
+    .pickup-instructions__text {
+        margin: 0;
+        font: 400 0.88rem/1.5 var(--font-family);
+        overflow-wrap: anywhere;
+        white-space: pre-line;
+    }
+}
