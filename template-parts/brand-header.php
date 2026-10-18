@@ -30,6 +30,12 @@
                     <path d="M8 9V6a4 4 0 0 1 8 0v3" stroke-linecap="round" />
                 </svg>
             </a>
+            <a class="brand-header__account" href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>" aria-label="Mon compte"<?php if ( is_account_page() ) { echo ' aria-current="page"'; } ?>>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="12" cy="7" r="4" />
+                    <path d="M4 22v-2a8 8 0 0 1 16 0v2" stroke-linecap="round" />
+                </svg>
+            </a>
         </div>
     <?php endif; ?>
 </div>
