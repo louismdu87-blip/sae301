@@ -342,6 +342,28 @@ add_filter( 'woocommerce_cart_item_remove_link', function ( $html, $key ) {
 add_action( 'woocommerce_cart_coupon', function () {
     echo '<span class="cart-page__coupon-label" aria-hidden="true">Code promo</span>';
 } );
+
+/** US-10.2 : libellés du formulaire natif, limités au panier. */
+add_filter( 'gettext_woocommerce', function ( $translation, $text ) {
+    if ( ! function_exists( 'is_cart' ) || ! is_cart() ) {
+        return $translation;
+    }
+    if ( 'Coupon code' === $text ) {
+        return 'Saisir votre code';
+    }
+    if ( 'Coupon:' === $text ) {
+        return 'Code promo';
+    }
+    return $translation;
+}, 10, 2 );
+
+add_filter( 'woocommerce_cart_totals_coupon_label', function ( $label, $coupon ) {
+    if ( ! is_cart() ) {
+        return $label;
+    }
+    return '<span class="cart-page__discount-label">Code promo : <span class="cart-page__discount-code">' . esc_html( $coupon->get_code() ) . '</span></span>';
+}, 10, 2 );
+
 function buissiere_cart_checkout_button() {
     echo '<a href="' . esc_url( wc_get_checkout_url() ) . '" class="checkout-button button alt wc-forward">Passer commande</a>';
 }
