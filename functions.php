@@ -488,3 +488,17 @@ function buissiere_email_pickup_instructions( $order, $sent_to_admin, $plain_tex
     }
 }
 add_action( 'woocommerce_email_after_order_table', 'buissiere_email_pickup_instructions', 20, 4 );
+
+/** US-9.2 : une commande retirée en boutique ne doit pas être annoncée comme expédiée. */
+function buissiere_completed_pickup_email_subject( $subject, $order ) {
+    if ( ! $order instanceof WC_Order ) {
+        return $subject;
+    }
+    foreach ( $order->get_shipping_methods() as $shipping ) {
+        if ( in_array( $shipping->get_method_id(), array( 'pickup_location', 'local_pickup' ), true ) ) {
+            return sprintf( 'Votre commande n°%s a été retirée en boutique — Buissière', $order->get_order_number() );
+        }
+    }
+    return $subject;
+}
+add_filter( 'woocommerce_email_subject_customer_completed_order', 'buissiere_completed_pickup_email_subject', 10, 2 );
