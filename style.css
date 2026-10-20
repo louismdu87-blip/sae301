@@ -2737,3 +2737,106 @@ Text Domain: buissiere
         color: var(--action-primary-label);
     }
 }
+
+
+/* US-13.2 : composant de suggestions partagé entre la fiche et le panier. */
+@layer components {
+    .product-recommendations {
+        clear: both;
+        margin-top: var(--space-12);
+        padding-top: var(--space-10);
+        border-top: var(--border-width) solid var(--border-subtle);
+    }
+
+    .product-recommendations:empty {
+        display: none;
+    }
+
+    .product-recommendations__title {
+        margin: 0 0 var(--space-4);
+        color: var(--text-brand);
+        font-size: var(--font-size-product);
+        font-weight: var(--font-weight-regular);
+        text-transform: uppercase;
+        letter-spacing: 0;
+    }
+
+    .product-recommendations__intro {
+        margin: 0 0 var(--space-6);
+        color: var(--text-primary);
+    }
+
+    .product-recommendations__return {
+        margin: var(--space-6) 0 0;
+    }
+}
+
+@layer woocommerce {
+    .single-product .product-recommendations {
+        grid-column: 1 / -1;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .product-recommendations .cross-sells {
+        float: none;
+        width: 100%;
+        margin: 0;
+    }
+
+    .product-recommendations .cross-sells ul.products {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-8);
+        margin: 0;
+    }
+
+    .product-recommendations ul.products li.product-recommendations__item {
+        display: flex;
+        float: none;
+        flex-direction: column;
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+    }
+
+    .product-recommendations__item > .product-card {
+        flex: 1;
+        max-width: none;
+        margin: 0;
+    }
+
+    .product-recommendations .product-card__image {
+        width: var(--product-image-width);
+        margin: 0;
+    }
+
+    .product-recommendations .product-card__title {
+        margin: 0;
+        color: var(--text-brand);
+        font-size: var(--font-size-product);
+        font-weight: var(--font-weight-regular);
+    }
+
+    .product-recommendations .product-card__button {
+        min-height: 2.31rem;
+        padding: var(--button-padding-y) var(--button-padding-x);
+        font: 300 var(--font-size-button)/1.25 var(--font-family);
+        text-transform: uppercase;
+    }
+
+    .product-recommendations .product-recommendations__price {
+        margin: var(--space-3) 0 0;
+        color: var(--text-primary);
+        font-size: 0.88rem;
+        text-align: center;
+    }
+
+    @media (min-width: 40rem) {
+        .product-recommendations .cross-sells ul.products {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            max-width: calc(var(--product-width) * 2 + var(--space-8));
+        }
+    }
+}

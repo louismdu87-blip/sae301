@@ -16,5 +16,12 @@ jQuery(function ($) {
     });
     $(document.body).on('input change', '.cart-quantity input.qty', syncButtons);
     $(document.body).on('updated_wc_div', syncButtons);
+    // WooCommerce actualise le formulaire et les totaux ; les suggestions suivent la même réponse.
+    $(document).on('ajaxSuccess', function (_event, xhr) {
+        if (typeof xhr.responseText !== 'string' || !xhr.responseText.includes('product-recommendations--cart')) return;
+        const response = $($.parseHTML(xhr.responseText, document, false));
+        const next = response.find('.product-recommendations--cart').first();
+        if (next.length) $('.product-recommendations--cart').replaceWith(next);
+    });
     syncButtons();
 });

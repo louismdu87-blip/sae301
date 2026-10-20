@@ -13,7 +13,6 @@ get_header();
             <h1 class="catalogue__title">Nos produits</h1>
         </div>
         <?php
-        get_template_part( 'template-parts/collections-navigation' );
         $categories = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true ) );
         $order = array( 'le-chocolat', 'la-confiserie', 'noel' );
         usort( $categories, function ( $a, $b ) use ( $order ) {
