@@ -1003,6 +1003,7 @@ Text Domain: buissiere
     .single-product .site-main,
     .tax-product_cat .site-main,
     .tax-product_tag .site-main,
+    .tax-product_collection .site-main,
     .woocommerce-cart .site-main,
     .woocommerce-checkout .site-main,
     .woocommerce-account .site-main {
@@ -2680,5 +2681,59 @@ Text Domain: buissiere
         .team-profile__content {
             padding-top: var(--space-6);
         }
+    }
+}
+
+
+/* US-12.3 : navigation des collections, cartes et grille natives réutilisées. */
+@layer components {
+    .collection-navigation {
+        margin-bottom: var(--space-10);
+        text-align: left;
+    }
+
+    .collection-navigation__title {
+        margin: 0 0 var(--space-4);
+        color: var(--text-brand);
+        font-size: var(--font-size-product);
+        font-weight: var(--font-weight-regular);
+        text-transform: uppercase;
+        letter-spacing: 0;
+    }
+
+    .collection-navigation__list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin: 0 0 var(--space-4);
+        padding: 0;
+        list-style: none;
+    }
+
+    .collection-navigation__link {
+        min-height: 2.75rem;
+        padding: var(--space-2) var(--space-4);
+        font-size: 1rem;
+    }
+}
+
+@layer woocommerce {
+    .tax-product_collection .woocommerce-products-header {
+        padding-bottom: var(--space-6);
+        text-align: left;
+    }
+
+    .tax-product_collection .collection-navigation {
+        margin-top: var(--space-8);
+        margin-bottom: 0;
+    }
+
+    .tax-product_collection .collection-navigation__link {
+        font-size: 1rem;
+    }
+
+    .tax-product_collection .collection-navigation__link[aria-current="page"] {
+        background: var(--action-primary-background);
+        color: var(--action-primary-label);
     }
 }

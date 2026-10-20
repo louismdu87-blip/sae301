@@ -532,3 +532,11 @@ function buissiere_team_archive_order( $query ) {
     }
 }
 add_action( 'pre_get_posts', 'buissiere_team_archive_order' );
+
+/** US-12.3 : archives WooCommerce natives, avec accès aux autres collections. */
+function buissiere_collection_navigation() {
+    if ( is_tax( 'product_collection' ) ) {
+        get_template_part( 'template-parts/collections-navigation' );
+    }
+}
+add_action( 'woocommerce_archive_description', 'buissiere_collection_navigation', 20 );
