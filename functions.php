@@ -524,3 +524,11 @@ function buissiere_completed_pickup_email_subject( $subject, $order ) {
     return $subject;
 }
 add_filter( 'woocommerce_email_subject_customer_completed_order', 'buissiere_completed_pickup_email_subject', 10, 2 );
+
+/** US-11.3 : ordre administrable, limité à l’archive principale de l’équipe. */
+function buissiere_team_archive_order( $query ) {
+    if ( ! is_admin() && $query->is_main_query() && $query->is_post_type_archive( 'equipe' ) ) {
+        $query->set( 'orderby', array( 'menu_order' => 'ASC', 'title' => 'ASC' ) );
+    }
+}
+add_action( 'pre_get_posts', 'buissiere_team_archive_order' );

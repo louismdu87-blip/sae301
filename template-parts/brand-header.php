@@ -20,6 +20,10 @@
         <ul class="brand-header__links">
             <li><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Accueil</a></li>
             <li><a href="<?php echo esc_url( home_url( '/#nos-produits' ) ); ?>">Nos produits</a></li>
+            <?php $team_url = get_post_type_archive_link( 'equipe' ); ?>
+            <?php if ( $team_url ) : ?>
+                <li><a href="<?php echo esc_url( $team_url ); ?>"<?php if ( is_post_type_archive( 'equipe' ) || is_singular( 'equipe' ) ) : ?> aria-current="<?php echo is_post_type_archive( 'equipe' ) ? 'page' : 'location'; ?>"<?php endif; ?>>Équipe</a></li>
+            <?php endif; ?>
         </ul>
     </nav>
     <?php if ( function_exists( 'wc_get_cart_url' ) ) : ?>
