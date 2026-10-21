@@ -665,3 +665,30 @@ function buissiere_product_review_form( $args ) {
     return $args;
 }
 add_filter( 'woocommerce_product_review_comment_form_args', 'buissiere_product_review_form' );
+
+/** US-15.2 : frais fixes sous le seuil SCF, recalculés par WooCommerce. */
+function buissiere_cart_preparation_fee( $cart ) {
+    if ( ( is_admin() && ! wp_doing_ajax() ) || ! $cart instanceof WC_Cart || $cart->is_empty() || ! function_exists( 'get_field' ) ) {
+        return;
+    }
+
+    $threshold = get_field( 'seuil_frais_preparation', 'option' );
+    $amount    = get_field( 'montant_frais_preparation', 'option' );
+    if ( ! is_numeric( $threshold ) || ! is_numeric( $amount ) ) {
+        return;
+    }
+
+    $decimals  = wc_get_price_decimals();
+    $threshold = round( (float) $threshold, $decimals );
+    $amount    = round( (float) $amount, $decimals );
+    if ( $threshold <= 0 || $amount <= 0 ) {
+        return;
+    }
+
+    // Produits après réductions, hors livraison, taxes et autres frais.
+    $products_total = round( (float) $cart->get_cart_contents_total(), $decimals );
+    if ( $products_total < $threshold ) {
+        $cart->add_fee( __( 'Frais de préparation', 'buissiere' ), $amount, false );
+    }
+}
+add_action( 'woocommerce_cart_calculate_fees', 'buissiere_cart_preparation_fee' );
