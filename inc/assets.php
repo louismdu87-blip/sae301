@@ -30,6 +30,7 @@ function buissiere_enqueue_styles() {
     if ( function_exists( 'is_cart' ) && is_cart() ) {
         wp_enqueue_script( 'buissiere-cart', get_stylesheet_directory_uri() . '/assets/js/cart.js', array( 'jquery', 'wc-cart' ), filemtime( get_stylesheet_directory() . '/assets/js/cart.js' ), array( 'in_footer' => true, 'strategy' => 'defer' ) );
     }
+    wp_enqueue_script( 'buissiere-navigation', get_stylesheet_directory_uri() . '/assets/js/navigation.js', array(), filemtime( get_stylesheet_directory() . '/assets/js/navigation.js' ), array( 'in_footer' => true, 'strategy' => 'defer' ) );
     wp_dequeue_style( 'storefront-fonts' );
     wp_dequeue_style( 'source-sans-pro' );
     wp_enqueue_style( 'storefront-child-style', get_stylesheet_uri(), array( 'storefront-style' ), filemtime( get_stylesheet_directory() . '/style.css' ) );

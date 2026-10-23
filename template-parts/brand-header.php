@@ -18,7 +18,12 @@ defined( 'ABSPATH' ) || exit; ?>
         }
         ?>
     </a>
-    <nav class="brand-header__navigation" aria-label="Navigation principale">
+    <button class="brand-header__toggle" type="button" aria-controls="brand-navigation" aria-expanded="false" aria-label="Ouvrir le menu" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+    <nav class="brand-header__navigation" id="brand-navigation" aria-label="Navigation principale">
         <ul class="brand-header__links">
             <li><a href="<?php echo esc_url( home_url( '/' ) ); ?>">Accueil</a></li>
             <li><a href="<?php echo esc_url( home_url( '/#nos-produits' ) ); ?>">Nos produits</a></li>
