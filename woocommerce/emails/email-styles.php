@@ -1,17 +1,5 @@
 <?php
-/**
- * Email Styles — personnalisation Buissière (US-8.2)
- *
- * This template can be overridden by copying it to yourtheme/woocommerce/emails/email-styles.php.
- *
- * HOWEVER, on occasion WooCommerce will need to update template files and you
- * (the theme developer) will need to copy the new files to your theme to
- * maintain compatibility. We try to do this as little as possible, but it does
- * happen. When this occurs the version of the template file will be bumped and
- * the readme will list any important changes.
- *
- * @see     https://woocommerce.com/document/template-structure/
- * @package WooCommerce\Templates\Emails
+/** Itération 8.
  * @version 11.0.0
  */
 
@@ -25,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improvements' );
 $block_email_editor_enabled = FeaturesUtil::feature_is_enabled( 'block_email_editor' );
 
-// Load colors.
 $bg               = get_option( 'woocommerce_email_background_color' );
 $body             = get_option( 'woocommerce_email_body_background_color' );
 $base             = get_option( 'woocommerce_email_base_color' );
@@ -36,12 +23,6 @@ $logo_image_width = get_option( 'woocommerce_email_header_image_width', '120' );
 $default_font     = 'Helvetica';
 $font_family      = $email_improvements_enabled ? get_option( 'woocommerce_email_font_family', $default_font ) : $default_font;
 
-/**
- * Check if we are in preview mode (WooCommerce > Settings > Emails).
- *
- * @since 9.6.0
- * @param bool $is_email_preview Whether the email is being previewed.
- */
 $is_email_preview = apply_filters( 'woocommerce_is_email_preview', false );
 
 if ( $is_email_preview ) {
@@ -64,26 +45,22 @@ if ( $is_email_preview ) {
 	$font_family      = $font_family_transient ? $font_family_transient : $font_family;
 }
 
-// Palette Buissière : cohérente avec les variables sémantiques du site.
 $bg = '#f0f0f0';
 $body = '#ffffff';
 $base = '#fe5000';
 $text = '#43454b';
 $footer_text = '#6d6d6d';
 
-// Only use safe fonts. They won't be escaped to preserve single quotes.
 $safe_font_family = EmailFont::$font[ $font_family ] ?? EmailFont::$font[ $default_font ];
 
 $base_text = wc_light_or_dark( $base, '#202020', '#ffffff' );
 
-// Pick a contrasting color for links.
 $link_color = wc_hex_is_light( $base ) ? $base : $base_text;
 
 if ( wc_hex_is_light( $body ) ) {
 	$link_color = wc_hex_is_light( $base ) ? $base_text : $base;
 }
 
-// If email improvements are enabled, always use the base color for links.
 if ( $email_improvements_enabled ) {
 	$link_color = $base;
 }
@@ -96,8 +73,6 @@ $base_lighter_40 = wc_hex_lighter( $base, 40 );
 $text_lighter_20 = wc_hex_lighter( $text, 20 );
 $text_lighter_40 = wc_hex_lighter( $text, 40 );
 
-// !important; is a gmail hack to prevent styles being stripped if it doesn't like something.
-// body{padding: 0;} ensures proper scale/positioning of the email in the iOS native email app.
 ?>
 body {
 	background-color: <?php echo esc_attr( $bg ); ?>;
@@ -139,7 +114,7 @@ body {
 	font-weight: bold;
 	line-height: 100%;
 	vertical-align: middle;
-	font-family: <?php echo $safe_font_family; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+	font-family: <?php echo $safe_font_family; ?>;
 }
 
 #template_header h1,
@@ -179,7 +154,7 @@ body {
 
 .email-logo-text {
 	color: <?php echo esc_attr( $link_color ); ?>;
-	font-family: <?php echo $safe_font_family; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+	font-family: <?php echo $safe_font_family; ?>;
 	font-size: 18px;
 }
 
@@ -195,7 +170,7 @@ body {
 
 #body_content table td td.email-additional-content {
 	color: <?php echo esc_attr( $text ); ?>;
-	font-family: <?php echo $safe_font_family; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+	font-family: <?php echo $safe_font_family; ?>;
 	padding: 32px 0 0;
 }
 
@@ -226,7 +201,7 @@ body {
 		border-top: 1px solid <?php echo esc_attr( $border_color ); ?>;
 	<?php endif; ?>
 	color: <?php echo esc_attr( $footer_text ); ?>;
-	font-family: <?php echo $safe_font_family; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+	font-family: <?php echo $safe_font_family; ?>;
 	font-size: 12px;
 	line-height: <?php echo $email_improvements_enabled ? '140%' : '150%'; ?>;
 	text-align: center;
@@ -345,7 +320,7 @@ body {
 
 #body_content_inner {
 	color: <?php echo esc_attr( $text_lighter_20 ); ?>;
-	font-family: <?php echo $safe_font_family; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+	font-family: <?php echo $safe_font_family; ?>;
 	font-size: <?php echo $email_improvements_enabled ? '16px' : '14px'; ?>;
 	line-height: 150%;
 	text-align: <?php echo is_rtl() ? 'right' : 'left'; ?>;
@@ -392,7 +367,7 @@ body {
 .address-title,
 .order-item-data {
 	color: <?php echo esc_attr( $text ); ?>;
-	font-family: <?php echo $safe_font_family; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+	font-family: <?php echo $safe_font_family; ?>;
 }
 
 .order-item-data {
@@ -425,7 +400,7 @@ body {
 
 h1 {
 	color: <?php echo esc_attr( $email_improvements_enabled ? $text : $base ); ?>;
-	font-family: <?php echo $safe_font_family; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+	font-family: <?php echo $safe_font_family; ?>;
 	font-size: <?php echo $email_improvements_enabled ? '32px' : '30px'; ?>;
 	font-weight: <?php echo $email_improvements_enabled ? 700 : 300; ?>;
 	<?php if ( $email_improvements_enabled ) : ?>
@@ -442,7 +417,7 @@ h1 {
 h2 {
 	color: <?php echo esc_attr( $email_improvements_enabled ? $text : $base ); ?>;
 	display: block;
-	font-family: <?php echo $safe_font_family; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+	font-family: <?php echo $safe_font_family; ?>;
 	font-size: <?php echo $email_improvements_enabled ? '20px' : '18px'; ?>;
 	font-weight: bold;
 	line-height: <?php echo $email_improvements_enabled ? '160%' : '130%'; ?>;
@@ -453,7 +428,7 @@ h2 {
 h3 {
 	color: <?php echo esc_attr( $email_improvements_enabled ? $text : $base ); ?>;
 	display: block;
-	font-family: <?php echo $safe_font_family; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+	font-family: <?php echo $safe_font_family; ?>;
 	font-size: 16px;
 	font-weight: bold;
 	line-height: <?php echo $email_improvements_enabled ? '160%' : '130%'; ?>;
@@ -493,7 +468,7 @@ h2.email-order-detail-heading span a {
 }
 
 .font-family {
-	font-family: <?php echo $safe_font_family; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+	font-family: <?php echo $safe_font_family; ?>;
 }
 
 .text-align-left {
@@ -504,10 +479,6 @@ h2.email-order-detail-heading span a {
 	text-align: <?php echo is_rtl() ? 'left' : 'right'; ?>;
 }
 
-/**
- * Media queries are not supported by all email clients, however they do work on modern mobile
- * Gmail clients and can help us achieve better consistency there.
- */
 @media screen and (max-width: 600px) {
 	<?php if ( $email_improvements_enabled ) : ?>
 		#template_header_image {
@@ -562,7 +533,7 @@ h2.email-order-detail-heading span a {
 	<?php endif; ?>
 }
 
-/* US-8.2 : styles simples, convertis en styles en ligne par WooCommerce. */
+/* Itération 8. */
 body, #outer_wrapper { background-color: <?php echo esc_attr( $bg ); ?>; }
 #wrapper { padding: 2rem 0; }
 #inner_wrapper, #template_container { border-radius: 0 !important; }

@@ -6,12 +6,11 @@ Version: 1.1.0
 Text Domain: buissiere
 */
 
-/* Le parent est isolé dans wordpress ; les variables et composants viennent du design system. */
+/* Itération 2. */
 @layer wordpress, fonts, tokens, reset, base, components, layout, woocommerce;
 
 @import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap") layer(fonts);
 
-/* 1. Variables Figma primitives et sémantiques, puis mesures partagées. */
 @layer tokens {
     :root {
         --neutral-0: #ffffff;
@@ -64,7 +63,6 @@ Text Domain: buissiere
         --feedback-danger-background: var(--danger-50);
         --feedback-danger-border: var(--danger-700);
 
-        /* Mesures de composants relevées dans l’inspecteur Figma. */
         --font-family: "Source Sans Pro", Arial, sans-serif;
         --font-weight-light: 300;
         --font-weight-regular: 400;
@@ -85,7 +83,6 @@ Text Domain: buissiere
         --product-image-width: 15.56rem;
         --product-image-height: 14.01rem;
 
-        /* Échelle d’espacement partagée, hors variables Figma. */
         --space-1: 0.25rem;
         --space-2: 0.5rem;
         --space-3: 0.75rem;
@@ -101,14 +98,12 @@ Text Domain: buissiere
     }
 }
 
-/* 2. Normalisation minimale des dimensions. */
 @layer reset {
     * {
         box-sizing: border-box;
     }
 }
 
-/* 3. Styles communs : typographie, éléments HTML et focus clavier. */
 @layer base {
     body {
         margin: 0;
@@ -167,7 +162,6 @@ Text Domain: buissiere
     }
 }
 
-/* 4. Composants BEM à reprendre dans le thème enfant. */
 @layer components {
     @layer accessibility {
         .skip-link {
@@ -283,10 +277,8 @@ Text Domain: buissiere
         }
     }
 
-
 }
 
-/* Mise en page mobile d’abord. Aucun gabarit du parent n’est modifié. */
 @layer layout {
     .site {
         overflow-x: clip;
@@ -302,13 +294,11 @@ Text Domain: buissiere
         background: var(--background-page);
     }
 
-    /* Garde les cibles des liens visibles sous l’en-tête. */
     #nos-produits,
     #main {
         scroll-margin-top: 9rem;
     }
 
-    /* La barre WordPress est fixe à partir de cette largeur. */
     @media (min-width: 37.56rem) {
         .admin-bar .site-header {
             top: var(--wp-admin--admin-bar--height, 2rem);
@@ -644,7 +634,7 @@ Text Domain: buissiere
     }
 }
 
-/* Itération 4 : informations produit réutilisables, mobile first. */
+/* Itération 4. */
 @layer components {
     .product-information {
         display: grid;
@@ -678,10 +668,9 @@ Text Domain: buissiere
     }
 }
 
-/* Adaptateurs WooCommerce : comportement natif, présentation du design system. */
 @layer woocommerce {
 
-    /* Itération 3 : formats sous l’image et quantité selon la maquette Figma. */
+    /* Itération 3. */
     .single-product div.product.product-view--variable {
         display: grid;
         grid-template-columns: minmax(0, 1fr);
@@ -876,7 +865,7 @@ Text Domain: buissiere
         margin-top: 1.5rem;
     }
 
-    /* Itération 5 : quantité et ajout au panier issus du modèle natif. */
+    /* Itération 5. */
     .single-product .woocommerce-variation-add-to-cart {
         display: flex;
         flex-wrap: wrap;
@@ -1226,7 +1215,7 @@ Text Domain: buissiere
     }
 }
 
-/* Itération 5 — adaptateurs du panier natif, mesures et couleurs du design system. */
+/* Itération 5. */
 @layer woocommerce {
     .woocommerce-cart .entry-header {
         margin-bottom: var(--space-8);
@@ -1735,7 +1724,7 @@ Text Domain: buissiere
     }
 }
 
-/* Itération 10 : promotions dans le panier natif, présentation mobile first. */
+/* Itération 10. */
 @layer woocommerce {
     .woocommerce-cart .actions .coupon {
         display: grid;
@@ -1887,7 +1876,7 @@ Text Domain: buissiere
     }
 }
 
-/* Itération 6 : informations de retrait dans le formulaire de commande natif. */
+/* Itération 6. */
 @layer components {
     .pickup-instructions {
         margin: var(--space-4) 0;
@@ -1910,7 +1899,7 @@ Text Domain: buissiere
     }
 }
 
-/* Itération 7 : composants de l’espace client, mobile first. */
+/* Itération 7. */
 @layer components {
     .account-page__steps {
         display: flex;
@@ -2094,7 +2083,6 @@ Text Domain: buissiere
     }
 }
 
-/* Adaptation des formulaires et des endpoints natifs, sans surcharge de modèle. */
 @layer woocommerce {
     .account-page .entry-header {
         margin-bottom: var(--space-8);
@@ -2469,8 +2457,7 @@ Text Domain: buissiere
     }
 }
 
-
-/* US-11.3–11.4 : équipe, dans la DA du site en attendant sa maquette Figma. */
+/* Itération 11. */
 @layer components {
     .team-card {
         display: flex;
@@ -2684,8 +2671,7 @@ Text Domain: buissiere
     }
 }
 
-
-/* US-12.3 : navigation des collections, cartes et grille natives réutilisées. */
+/* Itération 12. */
 @layer components {
     .collection-navigation {
         margin-bottom: var(--space-10);
@@ -2738,8 +2724,7 @@ Text Domain: buissiere
     }
 }
 
-
-/* US-13.2 : composant de suggestions partagé entre la fiche et le panier. */
+/* Itération 13. */
 @layer components {
     .product-recommendations {
         clear: both;
@@ -2841,8 +2826,7 @@ Text Domain: buissiere
     }
 }
 
-
-/* US-14.1 : avis natifs WooCommerce, habillage Figma mobile first. */
+/* Itération 14. */
 @layer woocommerce {
     .single-product div.product .product-reviews {
         grid-column: 1 / -1;

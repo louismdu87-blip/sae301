@@ -1,4 +1,6 @@
-<?php defined( 'ABSPATH' ) || exit; ?>
+<?php
+/* Itération 2. */
+defined( 'ABSPATH' ) || exit; ?>
 <a class="skip-link" href="#main">Aller au contenu</a>
 <div class="brand-header">
     <a class="brand-header__logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="Buissière — accueil">

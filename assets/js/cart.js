@@ -1,4 +1,4 @@
-/* Les modifications de quantité sont validées par le bouton natif Mettre à jour le panier. */
+/* Itération 5. */
 jQuery(function ($) {
     function syncButtons() {
         document.querySelectorAll('.cart-quantity').forEach(function (control) {
@@ -16,7 +16,7 @@ jQuery(function ($) {
     });
     $(document.body).on('input change', '.cart-quantity input.qty', syncButtons);
     $(document.body).on('updated_wc_div', syncButtons);
-    // WooCommerce actualise le formulaire et les totaux ; les suggestions suivent la même réponse.
+
     $(document).on('ajaxSuccess', function (_event, xhr) {
         if (typeof xhr.responseText !== 'string' || !xhr.responseText.includes('product-recommendations--cart')) return;
         const response = $($.parseHTML(xhr.responseText, document, false));

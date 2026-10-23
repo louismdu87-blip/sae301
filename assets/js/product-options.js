@@ -1,4 +1,4 @@
-/* Les boutons reflètent le sélecteur WooCommerce ; celui-ci gère les variations. */
+/* Itération 3. */
 jQuery(function ($) {
     $('.product-view--variable').each(function () {
         const product = this;
@@ -45,7 +45,6 @@ jQuery(function ($) {
                 meta.textContent = 'Total TTC' + (format ? ' · ' + format : '') + ' · ' + formatPrice(unitPrice) + ' / unité';
             }
         }
-
 
         function syncFormats() {
             groups.forEach(function (group) {

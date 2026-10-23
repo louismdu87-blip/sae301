@@ -1,5 +1,5 @@
 <?php
-/** Tableau de bord : uniquement les données du client connecté. */
+/* Itération 7. */
 defined( 'ABSPATH' ) || exit;
 if ( ! is_user_logged_in() ) { return; }
 $user = wp_get_current_user();

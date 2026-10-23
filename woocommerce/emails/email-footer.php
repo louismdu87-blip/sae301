@@ -1,17 +1,5 @@
 <?php
-/**
- * Email Footer — personnalisation Buissière (US-8.2)
- *
- * This template can be overridden by copying it to yourtheme/woocommerce/emails/email-footer.php.
- *
- * HOWEVER, on occasion WooCommerce will need to update template files and you
- * (the theme developer) will need to copy the new files to your theme to
- * maintain compatibility. We try to do this as little as possible, but it does
- * happen. When this occurs the version of the template file will be bumped and
- * the readme will list any important changes.
- *
- * @see https://woocommerce.com/document/template-structure/
- * @package WooCommerce\Templates\Emails
+/** Itération 8.
  * @version 10.4.0
  */
 
@@ -24,11 +12,11 @@ $email = $email ?? null;
 																	</td>
 																</tr>
 															</table>
-															<!-- End Content -->
+
 														</td>
 													</tr>
 												</table>
-												<!-- End Body -->
+
 											</td>
 										</tr>
 									</table>
@@ -36,7 +24,7 @@ $email = $email ?? null;
 							</tr>
 							<tr>
 								<td align="center" valign="top">
-									<!-- Footer -->
+
 									<table border="0" cellpadding="10" cellspacing="0" width="100%" id="template_footer" role="presentation">
 										<tr>
 											<td valign="top">
@@ -45,29 +33,19 @@ $email = $email ?? null;
 														<td colspan="2" valign="middle" id="credit">
 															<?php
 															$email_footer_text = get_option( 'woocommerce_email_footer_text' );
-															/**
-															 * This filter is documented in templates/emails/email-styles.php
-															 *
-															 * @since 9.6.0
-															 */
+
 															if ( apply_filters( 'woocommerce_is_email_preview', false ) ) {
 																$text_transient    = get_transient( 'woocommerce_email_footer_text' );
 																$email_footer_text = false !== $text_transient ? $text_transient : $email_footer_text;
 															}
-															// Personnalise le pied de page par défaut ; conserve tout texte administré différent.
+
                                                         if ( ! $email_footer_text || '{site_title}<br />{store_address}' === trim( $email_footer_text ) ) {
                                                             $email_footer_text = 'Chocolaterie Buissière<br />27 rue Jean Jaurès — 87000 Limoges<br /><a href="tel:+33555341044">05 55 34 10 44</a>';
                                                         }
 															echo wp_kses_post(
 																wpautop(
 																	wptexturize(
-																		/**
-																		 * Provides control over the email footer text used for most order emails.
-																		 *
-																		 * @since 4.0.0
-																		 *
-																		 * @param string $email_footer_text
-																		 */
+
 																		apply_filters( 'woocommerce_email_footer_text', $email_footer_text, $email )
 																	)
 																)
@@ -79,13 +57,13 @@ $email = $email ?? null;
 											</td>
 										</tr>
 									</table>
-									<!-- End Footer -->
+
 								</td>
 							</tr>
 						</table>
 					</div>
 				</td>
-				<td><!-- Deliberately empty to support consistent sizing and layout across multiple email clients. --></td>
+				<td></td>
 			</tr>
 		</table>
 	</body>

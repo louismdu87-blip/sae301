@@ -1,5 +1,5 @@
 <?php
-/** US-12.3 : accès aux archives natives des collections de produits. */
+/* Itération 12. */
 defined( 'ABSPATH' ) || exit;
 if ( ! taxonomy_exists( 'product_collection' ) ) {
     return;

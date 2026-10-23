@@ -1,4 +1,4 @@
-/* Le slot WooCommerce suit automatiquement l’affichage de la section retrait. */
+/* Itération 6. */
 (function () {
     const settings = window.buissierePickupInstructions;
     const checkout = window.wc && window.wc.blocksCheckout;

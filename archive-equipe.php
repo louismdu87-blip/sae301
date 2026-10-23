@@ -1,5 +1,5 @@
 <?php
-/** US-11.3 : liste des membres, avec la requête et la pagination natives. */
+/* Itération 11. */
 defined( 'ABSPATH' ) || exit;
 get_header();
 ?>

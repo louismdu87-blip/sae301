@@ -1,11 +1,14 @@
 <?php
-/** Catalogue de l’itération 2 : les données restent gérées dans WooCommerce. */
+/* Itération 2. */
 defined( 'ABSPATH' ) || exit;
 get_header();
 ?>
 <main id="main" class="catalogue">
     <div class="catalogue__hero">
-        <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/images/hero-buissiere.jpg' ); ?>" alt="Assortiment de chocolats Buissière" fetchpriority="high" width="5616" height="2551">
+        <picture>
+            <source type="image/webp" srcset="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/images/hero-buissiere-640.webp' ); ?> 640w, <?php echo esc_url( get_stylesheet_directory_uri() . '/assets/images/hero-buissiere-1280.webp' ); ?> 1280w, <?php echo esc_url( get_stylesheet_directory_uri() . '/assets/images/hero-buissiere-1920.webp' ); ?> 1920w" sizes="100vw">
+            <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/images/hero-buissiere.jpg' ); ?>" alt="Assortiment de chocolats Buissière" fetchpriority="high" decoding="async" width="5616" height="2551">
+        </picture>
         <p class="catalogue__intro">Buissière, mythique chocolaterie-confiserie de Limoges, depuis 1948</p>
     </div>
     <div class="catalogue__content" id="nos-produits">
@@ -15,6 +18,8 @@ get_header();
         <?php
         get_template_part( 'template-parts/collections-navigation' );
         $categories = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true ) );
+        $categories = is_wp_error( $categories ) ? array() : $categories;
+        $all_products = wc_get_products( array( 'status' => 'publish', 'limit' => -1, 'orderby' => 'ID', 'order' => 'ASC' ) );
         $order = array( 'le-chocolat', 'la-confiserie', 'noel' );
         usort( $categories, function ( $a, $b ) use ( $order ) {
             $a_index = array_search( $a->slug, $order, true );
@@ -23,9 +28,8 @@ get_header();
         } );
         $displayed = array();
         foreach ( $categories as $category ) :
-            $products = wc_get_products( array( 'status' => 'publish', 'limit' => -1, 'category' => array( $category->slug ), 'orderby' => 'ID', 'order' => 'ASC' ) );
-            $products = array_filter( $products, function ( $item ) use ( $displayed ) {
-                return ! in_array( $item->get_id(), $displayed, true ) && in_array( $item->get_catalog_visibility(), array( 'visible', 'catalog' ), true ) && $item->is_visible();
+            $products = array_filter( $all_products, function ( $item ) use ( $category, $displayed ) {
+                return in_array( (int) $category->term_id, $item->get_category_ids(), true ) && ! in_array( $item->get_id(), $displayed, true ) && in_array( $item->get_catalog_visibility(), array( 'visible', 'catalog' ), true ) && $item->is_visible();
             } );
             if ( ! $products ) { continue; }
             ?>

@@ -1,5 +1,5 @@
 <?php
-/** Carte réutilisable d’un membre ; toutes les données viennent de WordPress. */
+/* Itération 11. */
 defined( 'ABSPATH' ) || exit;
 $function = get_post_meta( get_the_ID(), 'fonction', true );
 $protected = post_password_required();
